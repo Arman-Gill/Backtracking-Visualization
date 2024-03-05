@@ -216,6 +216,7 @@ export async function run(cellsTemp, boardValuesTemp, totalStepCountTemp, speed)
    await solve(0, 0)
 
    stopExecution = false
+   stepCount = 0
 
    if(solutionFound){
     printStep('green');

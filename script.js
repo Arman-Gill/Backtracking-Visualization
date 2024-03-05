@@ -31,9 +31,7 @@ function returnCopyofBoardValues(boardToBeCopied){
 
 let visualizationOn = false;
 
-startButton.addEventListener('click', startVisualization);
-stopButton.addEventListener('click', stopVisualization);
-changeBoardButton.addEventListener('click', changeBoard);
+
 
 speedValueRange.addEventListener('change', ()=>{
     changeSpeed(speedValueRange.value)
@@ -54,14 +52,19 @@ function changeBoard(){
 
 }
 
-async function startVisualization(){
+function updateVisualizationOn(){
+    visualizationOn = !visualizationOn
+}
+
+/*async function startVisualization(){
     if (visualizationOn === false){
-        visualizationOn = !visualizationOn;
+        updateVisualizationOn()
 
         addClass(changeBoardButton, 'disabledButton')
         removeClass(stopButton, 'disabledButton')
 
         startButton.removeEventListener('click', startVisualization)
+        stopButton.addEventListener('click', stopVisualization)
         changeBoardButton.removeEventListener('click', changeBoard)
 
         addClass(startButton, 'disabledButton')
@@ -76,24 +79,63 @@ async function startVisualization(){
             reset()
         }
     
-}}
+}}*/
 
-function stopVisualization(){
+async function startVisualization(){
+
+        updateVisualizationOn()
+
+        addClass(changeBoardButton, 'disabledButton')
+        removeClass(stopButton, 'disabledButton')
+        addClass(startButton, 'disabledButton')
+
+        startButton.removeEventListener('click', startVisualization)
+        stopButton.addEventListener('click', stopVisualization)
+        changeBoardButton.removeEventListener('click', changeBoard)
+
+        
+        const boardValues = fetchBoardValues()
+        const boardValuesCopy = returnCopyofBoardValues(boardValues)
+        const totalStepCount = fetchTotalStepCount()
+        const solutionFound = await run(cells, boardValuesCopy, totalStepCount, speedValueRange.value);
+        if (solutionFound){
+            successfulCompletionAnimation()
+        } 
+        else {
+            reset()
+        }
+    
+}
+
+/*function stopVisualization(){
     if (visualizationOn){
-        visualizationOn = !visualizationOn
         stop()
+        reset()
+        
     }
     else{
         reset()
     }
     
+}*/
+function stopVisualization(){
+    if(visualizationOn === true)
+    {
+    stop()
+    reset()}
+
+    else{
+        reset()
+    }
 }
 
 function successfulCompletionAnimation(){
-    startButton.addEventListener('click', startVisualization)
-    changeBoardButton.addEventListener('click', changeBoard)
-    removeClass(startButton, 'disabledButton')
-    removeClass(changeBoardButton, 'disabledButton')
+    //startButton.addEventListener('click', startVisualization)
+    //changeBoardButton.addEventListener('click', changeBoard)
+    //removeClass(startButton, 'disabledButton')
+    //removeClass(changeBoardButton, 'disabledButton')
+    updateVisualizationOn()
+    editInnerHTML(stopButton, 'Reset')
     
     
 }
@@ -107,6 +149,11 @@ function emptyBoard(){
 }
 
 function reset(){
+    if(visualizationOn === true){
+        updateVisualizationOn()
+    }
+    
+    editInnerHTML(stopButton, 'Stop Visualization')
     const blueCells = document.querySelectorAll('.blueCell')
     blueCells.forEach(cell => {
         removeClass(cell, 'blueCell')
@@ -117,11 +164,12 @@ function reset(){
 
     startButton.addEventListener('click', startVisualization)
     changeBoardButton.addEventListener('click', changeBoard)
+    stopButton.removeEventListener('click', stopVisualization)
     removeClass(changeBoardButton, 'disabledButton')
     removeClass(startButton, 'disabledButton')
     addClass(stopButton, 'disabledButton')
 
-    speedValueRange.value = 0
+    speedValueRange.value = 50
 }
 
 
@@ -142,8 +190,11 @@ function placeBoardValues(){
 
 function main(){
     placeBoardValues()
-    speedValueRange.value = 0
+    speedValueRange.value = 50
     addClass(stopButton, 'disabledButton')
+    startButton.addEventListener('click', startVisualization);
+    stopButton.addEventListener('click', stopVisualization);
+    changeBoardButton.addEventListener('click', changeBoard);
 }
 
 main()

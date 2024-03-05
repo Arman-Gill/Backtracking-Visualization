@@ -34,7 +34,6 @@ export function printStep(code, value){
     mainDiv.appendChild(text)
     screen.appendChild(mainDiv);
     screen.scrollTop = screen.scrollHeight;
-    
 
     
 }
